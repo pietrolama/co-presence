@@ -1,0 +1,21 @@
+# CO-PRESENCE - Cognitive Co-Presence Experiment
+# Core dependencies
+
+# LLM Integration
+openai>=1.0.0
+
+# Vector Store / RAG
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+
+# Data handling
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+
+# Async support
+aiofiles>=23.0.0
+
+# Utilities
+numpy>=1.24.0
+rich>=13.0.0
+
