@@ -199,8 +199,18 @@ class Kernel:
                 cycle_id=cycle_id,
                 comment=artifact.profile_update.comment,
             )
+            # Save updated profile to disk
+            self._save_profile(agent)
         
         return artifact
+    
+    def _save_profile(self, agent: Agent) -> None:
+        """Save agent profile to disk after update"""
+        from pathlib import Path
+        profiles_path = Path(self.environment.storage_path).parent / "profiles"
+        profiles_path.mkdir(parents=True, exist_ok=True)
+        profile_name = agent.name.lower().replace(" ", "_")
+        agent.profile.save(profiles_path / f"{profile_name}_profile.json")
     
     def run_cycle(self) -> tuple[Artifact, Artifact]:
         """

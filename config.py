@@ -28,9 +28,9 @@ OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.deepseek.com/v1")
 LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-chat")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 
-# Perturbation settings
-PERTURBATION_MIN_CYCLES = int(os.getenv("PERTURBATION_MIN_CYCLES", 10))
-PERTURBATION_MAX_CYCLES = int(os.getenv("PERTURBATION_MAX_CYCLES", 30))
+# Perturbation settings (lowered for initial testing)
+PERTURBATION_MIN_CYCLES = int(os.getenv("PERTURBATION_MIN_CYCLES", 3))
+PERTURBATION_MAX_CYCLES = int(os.getenv("PERTURBATION_MAX_CYCLES", 8))
 
 # Agent names
 AGENT_A_NAME = "Agent A"
