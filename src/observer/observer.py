@@ -64,7 +64,9 @@ class Observer:
         self.storage_path = storage_path
         self.storage_path.mkdir(parents=True, exist_ok=True)
         self.metrics_file = self.storage_path / "metrics.jsonl"
+        self.metrics_csv = self.storage_path / "metrics.csv"
         self.summary_file = self.storage_path / "summary.json"
+        self._init_csv()
     
     def compute_agent_metrics(self, artifact: Artifact) -> AgentMetrics:
         """Compute metrics for a single artifact"""
@@ -127,10 +129,48 @@ class Observer:
             both_silent=both_silent,
         )
     
+    def _init_csv(self) -> None:
+        """Initialize CSV file with headers"""
+        if not self.metrics_csv.exists():
+            headers = [
+                "cycle_id", "timestamp",
+                "a_step_count", "a_open_end_ratio", "a_avg_step_length", 
+                "a_is_silent", "a_profile_changed", "a_artifact_type",
+                "b_step_count", "b_open_end_ratio", "b_avg_step_length",
+                "b_is_silent", "b_profile_changed", "b_artifact_type",
+                "both_silent"
+            ]
+            with open(self.metrics_csv, "w", encoding="utf-8") as f:
+                f.write(",".join(headers) + "\n")
+    
     def log_cycle(self, cycle_metrics: CycleMetrics) -> None:
-        """Append cycle metrics to log"""
+        """Append cycle metrics to log (JSONL and CSV)"""
+        # JSONL
         with open(self.metrics_file, "a", encoding="utf-8") as f:
             f.write(cycle_metrics.model_dump_json() + "\n")
+        
+        # CSV
+        a = cycle_metrics.agent_a
+        b = cycle_metrics.agent_b
+        row = [
+            str(cycle_metrics.cycle_id),
+            cycle_metrics.timestamp.isoformat(),
+            str(a.step_count if a else 0),
+            f"{a.open_end_ratio:.2f}" if a else "0",
+            f"{a.avg_step_length:.1f}" if a else "0",
+            str(a.is_silent if a else False),
+            str(a.profile_changed if a else False),
+            a.artifact_type if a else "",
+            str(b.step_count if b else 0),
+            f"{b.open_end_ratio:.2f}" if b else "0",
+            f"{b.avg_step_length:.1f}" if b else "0",
+            str(b.is_silent if b else False),
+            str(b.profile_changed if b else False),
+            b.artifact_type if b else "",
+            str(cycle_metrics.both_silent),
+        ]
+        with open(self.metrics_csv, "a", encoding="utf-8") as f:
+            f.write(",".join(row) + "\n")
     
     def compute_summary(self, environment: Environment) -> dict[str, Any]:
         """
